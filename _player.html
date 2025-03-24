@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Localflix</title>
+    <style>
+        body { background-color: #141414; color: #fff; font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        video { max-width: 90%; margin-top: 20px; border: 5px solid #fff; border-radius: 8px; }
+        a { color: #fff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1 id="video-title">Loading...</h1>
+    
+    <video id="video-player" controls>
+        <source id="video-source" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div style="margin-top: 20px;">
+        <a href="_index.html">Go back</a>
+    </div>
+    
+    <script>
+        // helper function to get query parameters
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // get video name from URL
+        const videoName = getQueryParam('video');
+        if (videoName) {
+            const decodedName = decodeURIComponent(videoName);
+            let folderName = decodedName;
+            if (decodedName.indexOf('/') !== -1) {
+                folderName = decodedName.split('/')[0];
+            }
+
+            // set folder name as title
+            document.getElementById('video-title').textContent = folderName;
+            // set video source
+            document.getElementById('video-source').src = decodedName;
+            // load the video
+            document.getElementById('video-player').load();
+
+            // todo : add .str somehow (not allowed in browser)
+            
+            // derive subtitle file from source file name
+            // for example: "folder/source.mp4" -> "folder/source.srt"
+            // const subtitlePath = decodedName.replace(/\.[^/.]+$/, ".srt");
+            
+            // create a track element for subtitles
+            // const track = document.createElement('track');
+            // track.kind = "subtitles";
+            // track.label = "English"; // Or otherwise
+            // track.srclang = "en";
+            // track.src = subtitlePath;
+            // track.default = true;
+            // document.getElementById('video-player').appendChild(track);
+        
+        } else {
+            document.getElementById('video-title').textContent = "No video specified";
+        }
+    </script>
+</body>
+</html>
