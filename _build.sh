@@ -18,9 +18,11 @@
 
 shopt -s nullglob
 
-output="_index.html"
+# generate index page
 
-cat << 'EOF' > "$output"
+index="_index.html"
+
+cat << 'EOF' > "$index"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,7 +115,7 @@ printf "%s\n" *.jpg *.png | sort -V | while IFS= read -r file; do
         else
             encoded=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$base")
         fi
-        cat << EOF >> "$output"
+        cat << EOF >> "$index"
     <div class="gallery-item" onclick="location.href='_player.html?video=${encoded}'">
       <img src="$file" alt="$base">
       <div class="overlay">
@@ -125,10 +127,71 @@ EOF
 done
 
 # end of file HTML tags
-cat << 'EOF' >> "$output"
+cat << 'EOF' >> "$index"
 </div>
 </body>
 </html>
 EOF
 
-echo "Localflix created as $output"
+echo "Localflix : $index created"
+
+# generate player page
+
+player="_player.html"
+
+cat << 'EOF' > "$player"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Localflix</title>
+    <style>
+        body { background-color: #141414; color: #fff; font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        video { max-width: 90%; margin-top: 20px; border: 5px solid #fff; border-radius: 8px; }
+        a { color: #fff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1 id="video-title">Loading...</h1>
+    
+    <video id="video-player" controls>
+        <source id="video-source" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div style="margin-top: 20px;">
+        <a href="_index.html">Go back</a>
+    </div>
+    
+    <script>
+        // helper function to get query parameters
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // get video name from URL
+        const videoName = getQueryParam('video');
+        if (videoName) {
+            const decodedName = decodeURIComponent(videoName);
+            let folderName = decodedName;
+            if (decodedName.indexOf('/') !== -1) {
+                folderName = decodedName.split('/')[0];
+            }
+
+            // set folder name as title
+            document.getElementById('video-title').textContent = folderName;
+            // set video source
+            document.getElementById('video-source').src = decodedName;
+            // load the video
+            document.getElementById('video-player').load();
+        
+        } else {
+            document.getElementById('video-title').textContent = "No video specified";
+        }
+    </script>
+</body>
+</html>
+EOF
+
+echo "Localflix : $player created"
