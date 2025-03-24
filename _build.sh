@@ -90,34 +90,37 @@ cat << 'EOF' > "$index"
 <div class="gallery">
 EOF
 
-# loop through all .jpg, .png files and add them to page
-printf "%s\n" *.jpg *.png | sort -V | while IFS= read -r file; do
-    if [ -f "$file" ]; then
-        base="${file%.*}"
+# loop through all dirs in folder
+for dir in */; do
+    if [ -d "$dir" ]; then
+        base="${dir%/}"
+        
+        # find poster image inside folder (first match)
+        poster=$(find "$dir" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" \) | sort -V | head -n 1)
+        # skip if no image file in folder
+        [ -z "$poster" ] && continue
+
+        # find video file inside folder
         video_file=""
-        # check if folder with same base name exists
-        if [ -d "$base" ]; then
-            # loop through list of video extensions
-            for ext in mp4 avi mkv; do
-                # convert extension to uppercase using tr
-                upper_ext=$(echo "$ext" | tr '[:lower:]' '[:upper:]')
-                # look for files with extension in both lowercase and uppercase
-                video_matches=( "$base"/*."$ext" "$base"/*."$upper_ext" )
-                if [ ${#video_matches[@]} -gt 0 ] && [ -f "${video_matches[0]}" ]; then
-                    video_file="${video_matches[0]}"
-                    break
-                fi
-            done
-        fi
-        # URL-encode video file path if found, otherwise use base name
-        if [ -n "$video_file" ]; then
-            encoded=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$video_file")
-        else
-            encoded=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$base")
-        fi
+        for ext in mp4 avi mkv; do
+            # convert extension to uppercase for alternate matching
+            upper_ext=$(echo "$ext" | tr '[:lower:]' '[:upper:]')
+            video_matches=( "$dir"/*."$ext" "$dir"/*."$upper_ext" )
+            if [ ${#video_matches[@]} -gt 0 ] && [ -f "${video_matches[0]}" ]; then
+                video_file="${video_matches[0]}"
+                break
+            fi
+        done
+        # skip if no video file in folder
+        [ -z "$video_file" ] && continue
+
+        # URL-encode video file path using Python 3
+        encoded=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$video_file")
+
+        # append to index page
         cat << EOF >> "$index"
     <div class="gallery-item" onclick="location.href='_player.html?video=${encoded}'">
-      <img src="$file" alt="$base">
+      <img src="$poster" alt="$base">
       <div class="overlay">
          <div class="text">$base</div>
       </div>
