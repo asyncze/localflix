@@ -3,12 +3,10 @@
 
 ---
 
-<p align="center"><strong>Netflix but on localhost.</strong></p>
+<p align="center"><h1>Netflix but on <strong>localhost</strong>.</h1></p>
 
 ![print_1.png](print_1.png)
 
-<p align="center">Embedded player.</p>
+<p align="center"><h2>Embedded player.</h2></p>
 
 ![print_2.png](print_2.png)
-
-<p align="center">(Working on loading subtitle.)</p>
