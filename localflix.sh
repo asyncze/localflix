@@ -157,7 +157,7 @@ cat << 'EOF' > "$player"
 <body>
     <h1 id="video-title">Loading...</h1>
     
-    <video id="video-player" controls>
+    <video id="video-player" controls preload="metadata">
         <source id="video-source" src="" type="video/mp4">
         Your browser does not support the video tag.
     </video>
