@@ -1,5 +1,5 @@
 
-![localflix.png](localflix.png)
+<p align="center"><img src="localflix.png"></p>
 
 ---
 
