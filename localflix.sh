@@ -4,17 +4,6 @@
 #
 # This script generates an index.html gallery from all .jpg and .png files in the current directory.
 # Hovering over an image shows its name with a transparent dark overlay.
-#
-# Example folder structure:
-#   movies/
-#   ├── _build.sh
-#   ├── _index.html
-#   ├── 2001 A Space Odyssey (1968)/
-#   │   ├── 2001 A Space Odyssey (1968).png
-#   │   └── ...
-#   ├── A.I. Artificial Intelligence (2001)/
-#   │   ├── A.I. Artificial Intelligence (2001).png
-#   │   └── ...
 
 shopt -s nullglob
 
@@ -126,17 +115,85 @@ cat << 'EOF' > "$index"
 <div class="gallery">
 EOF
 
-# loop through all dirs in folder
+# loop through all dirs in folder (image inside dir)
+
+# Example folder structure:
+#   movies/
+#   ├── _build.sh
+#   ├── _index.html
+#   ├── 2001 A Space Odyssey (1968)/
+#   │   ├── 2001 A Space Odyssey (1968).png
+#   │   └── ...
+#   ├── A.I. Artificial Intelligence (2001)/
+#   │   ├── A.I. Artificial Intelligence (2001).png
+#   │   └── ...
+# for dir in */; do
+#     if [ -d "$dir" ]; then
+#         base="${dir%/}"
+        
+#         # find poster image inside folder (first match)
+#         poster=$(find "$dir" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) | sort -V | head -n 1)
+#         # skip if no image file in folder
+#         [ -z "$poster" ] && continue
+
+#         # find video file inside folder
+#         video_file=""
+#         for ext in mp4 avi mkv; do
+#             # convert extension to uppercase for alternate matching
+#             upper_ext=$(echo "$ext" | tr '[:lower:]' '[:upper:]')
+#             video_matches=( "$dir"/*."$ext" "$dir"/*."$upper_ext" )
+#             if [ ${#video_matches[@]} -gt 0 ] && [ -f "${video_matches[0]}" ]; then
+#                 video_file="${video_matches[0]}"
+#                 break
+#             fi
+#         done
+#         # skip if no video file in folder
+#         [ -z "$video_file" ] && continue
+
+#         # URL-encode video file path using Python 3
+#         encoded=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$video_file")
+
+#         # append to index page
+#         cat << EOF >> "$index"
+#     <div class="gallery-item" onclick="playVideo('${encoded}', this)">
+#         <img src="$poster" alt="$base">
+#         <div class="overlay">
+#             <div class="text">$base</div>
+#         </div>
+#     </div>
+# EOF
+#     fi
+# done
+
+# loop through all dirs in folder (image outside dir)
+
+# Example folder structure:
+#   movies/
+#   ├── _localflix.sh
+#   ├── _index.html
+#   ├── 2001 A Space Odyssey (1968).png
+#   ├── 2001 A Space Odyssey (1968)/
+#   │   └── ...
+#   ├── A.I. Artificial Intelligence (2001).png
+#   ├── A.I. Artificial Intelligence (2001)/
+#   │   └── ...
 for dir in */; do
     if [ -d "$dir" ]; then
         base="${dir%/}"
         
-        # find poster image inside folder (first match)
-        poster=$(find "$dir" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" \) | sort -V | head -n 1)
-        # skip if no image file in folder
+        # look for image in root folder with the same name as directory
+        poster=""
+        for ext in jpg png jpeg; do
+            candidate="${base}.${ext}"
+            if [ -f "$candidate" ]; then
+                poster="$candidate"
+                break
+            fi
+        done
+        # skip if no matching image is found
         [ -z "$poster" ] && continue
 
-        # find video file inside folder
+        # find video file inside directory
         video_file=""
         for ext in mp4 avi mkv; do
             # convert extension to uppercase for alternate matching
@@ -150,7 +207,7 @@ for dir in */; do
         # skip if no video file in folder
         [ -z "$video_file" ] && continue
 
-        # URL-encode video file path using Python 3
+        # URL-encode the video file path using Python 3
         encoded=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$video_file")
 
         # append to index page
