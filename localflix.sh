@@ -119,7 +119,7 @@ EOF
 
 # Example folder structure:
 #   movies/
-#   ├── _build.sh
+#   ├── _localflix.sh
 #   ├── _index.html
 #   ├── 2001 A Space Odyssey (1968)/
 #   │   ├── 2001 A Space Odyssey (1968).png
