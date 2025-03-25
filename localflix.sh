@@ -9,11 +9,11 @@
 #   movies/
 #   ├── _build.sh
 #   ├── _index.html
-#   ├── 2001 A Space Odyssey (1968).png
 #   ├── 2001 A Space Odyssey (1968)/
+#   │   ├── 2001 A Space Odyssey (1968).png
 #   │   └── ...
-#   ├── A.I. Artificial Intelligence (2001).png
 #   ├── A.I. Artificial Intelligence (2001)/
+#   │   ├── A.I. Artificial Intelligence (2001).png
 #   │   └── ...
 
 shopt -s nullglob
@@ -57,7 +57,7 @@ cat << 'EOF' > "$index"
         margin-top: 20px;
     }
     .gallery-item {
-        border-radius: 8px;
+        border-radius: 24px;
         position: relative;
         overflow: hidden;
     }
@@ -83,7 +83,7 @@ cat << 'EOF' > "$index"
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
+        border-radius: 24px;
     }
     .gallery-item:hover .overlay {
         opacity: 1;
@@ -228,6 +228,9 @@ cat << 'EOF' >> "$index"
 
         // smooth scroll into view
         container.scrollIntoView({ behavior: 'smooth' });
+        video.play().catch(function(error) {
+            console.log("Autoplay failed:", error);
+        });
     }
 </script>
 
